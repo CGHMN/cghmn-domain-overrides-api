@@ -1,0 +1,249 @@
+<html>
+
+<head>
+	<title>CGHMN Domain Overrides API</title>
+	<style>
+		tt {
+			word-break: keep-all;
+			white-space: nowrap;
+		}
+	</style>
+</head>
+
+<body>
+	<h2 style="text-decoration: underline;">CGHMN Domain Overrides API</h2>
+
+	<h3 id="introduction">Introduction</h3>
+	<article>
+		This HTTP endpoint allows you to fetch a list of all domains the CGHMN overrides.<br />
+		<br />
+		We override domains for a few reasons:
+		<ul>
+			<li>
+				<b>"Dead" Domains:</b>
+				Domains which have existed once upon a time but are no longer active, redirected towards
+				the CGHMN to revive websites and services that were once accessible on those domains.<br />
+				These should not collide with real-world/clear-net domains.
+			</li>
+			<li>
+				<b>"Live" Domains:</b>
+				Domains which still resolve and offer services on the clear-net, but are not compatible
+				with most retro machines on the network or are used for different services nowadays.<br />
+				These might break modern services or make them entirely inacccessible, but at the same
+				time add or return some functionality to retro software on the network.
+			</li>
+			<li>
+				<b>Custom TLDs:</b>
+				These are Top-Level Domain assignments for custom TLDs members of the network host their
+				own websites and services under. TLD assignments on the network should not collide with
+				TLDs existing on the real-world/clear-net, but with the ever-changing landscape of TLDs
+				out there, it's not impossible that a TLD assigned to a member of the network becomes
+				are real TLD out on the clear-net later down the line.
+			</li>
+		</ul>
+		If you don't mind modern services potentially breaking on your retro machines and want to experience
+		the full CGHMN experience, you can simply set your DNS server on your CGHMN router or individual
+		machines connected to the CGHMN to <tt>100.64.64.64</tt> and start browsing!<br />
+		This is the default configuration if you used our
+		<a href="https://firmware.cghmn.org" target="_blank">image builder</a> or configured an existing
+		router using the setup script according to the
+		<a href="https://wiki.cursedsilicon.net/wiki/How_to_Get_Connected" target="_blank">How To Get Connected</a>
+		wiki entry.
+	</article>
+
+	<br />
+
+	<h3 id="how-to">How-To Use</h3>
+	<article>
+		If you have a more complex setup which requires "split-DNS" however, where some domains are resolved
+		by one DNS server and other domains by another, you might find this API useful.
+		By periodically querying the <a href="/lists/filtered" target="_blank"><tt>/lists/filtered</tt></a>
+		endpoint, you can get the most up-to-date domains the CGHMN overrides and integrate them with your
+		local DNS resolver.<br />
+		<a href="#dnsmasq-example"><small>(See below for a dnsmasq example)</small></a><br />
+		<br />
+		You can also apply certain filters as query parameters, if you would like to control which domains are
+		being returned by the API. Multiple values can be specified per filter by separating them with a comma.
+		To see possible values for each kind of filter (<tt>domains</tt>, <tt>categories</tt> or <tt>types</tt>),
+		navigate to <a href="/lists/filtered" target="_blank"><tt>/lists/filtered</tt></a> without any query
+		parameters.
+
+		<h4 id="filters">Available filters</h4>
+		<ul>
+			<li>
+				<b><tt>allowed_domains</tt></b><br />
+				Set a list of domains which shall be included in the domain name list. Any domains not in this
+				list are being filtered from the output list, regardless of other filters.<br />
+				Example: <a href="/lists/filtered?allowed_domains=microsoft.com" target="_blank">
+					<tt>/lists/filtered?allowed_domains=microsoft.com</tt>
+				</a>, allow only microsoft.com and *.microsoft.com domains.
+			</li>
+			<li>
+				<b><tt>denied_domains</tt></b><br />
+				Set a list of domains which shall never be included in the output list.<br />
+				Example: <a href="/lists/filtered?denied_domains=microsoft.com" target="_blank">
+					<tt>/lists/filtered?denied_domains=microsoft.com</tt>
+				</a>, never allow microsoft.com or *.microsoft.com domains.
+			</li>
+			<li>
+				<b><tt>allowed_categories</tt></b><br />
+				Set a list of categories which shall be included in the output list. Any categories not in this
+				list are being filtered from the output list.<br />
+				Example: <a href="/lists/filtered?allowed_categories=quakeworld,phantasy-star-online" target="_blank">
+					<tt>/lists/filtered?allowed_categories=quakeworld,phantasy-star-online</tt>
+				</a>, allow domains restoring QuakeWorld and Phantasy Star Online functionality but nothing else.
+			</li>
+			<li>
+				<b><tt>denied_categories</tt></b><br />
+				Set a list of categories which shall never be included in the output list.<br />
+				Example: <a href="/lists/filtered?denied_categories=blackhole-adobe,macromedia" target="_blank">
+					<tt>/lists/filtered?denied_categories=blackhole-adobe,macromedia</tt>
+				</a>, allow all overrides except ones that "blackhole" (block) certain Adobe servers
+				or redirect Macromedia domains to a local server on the CGHMN.
+			</li>
+			<li>
+				<b><tt>allowed_types</tt></b><br />
+				Set a list of override types which shall be included in the output list. Any types not in this
+				list are being filtered from the output list.<br />
+				Example: <a href="/lists/filtered?allowed_types=tld,dead" target="_blank">
+					<tt>/lists/filtered?allowed_types=tld,dead</tt>
+				</a>, allow overrides for "dead" domains and custom TLDs, but not "live" domains.
+			</li>
+			<li>
+				<b><tt>denied_types</tt></b><br />
+				Set a list of override types which shall never be included in the output list.<br />
+				Example: <a href="/lists/filtered?denied_types=tld" target="_blank">
+					<tt>/lists/filtered?denied_types=tld</tt>
+				</a>, allow all overrides except custom TLDs.
+			</li>
+		</ul>
+		<br />
+		Note: Domains specified in the <tt>allowed_domains</tt> and <tt>denied_domains</tt> filters match for the
+		specified domain itself <i>and all subdomains under it</i>. So if you specify
+		<tt>?allowed_domains=example.org</tt>, not only will <tt>example.org</tt> itself be allowed to be
+		overridden, but also for example <tt>www.example.org</tt>.
+
+		<h4 id="output-format">Output format</h4>
+		In addition to filters, there is also the <tt>as</tt> query parameter, which controls in what format the
+		list is being rendered. Currently, the following values are valid output formats:
+		<ul>
+			<li>
+				<b><tt>text</tt> (Default)</b><br />
+				Basic text output, with details about each domain entry, using pounds (#) to denote comments.<br />
+				Each domain is on its own line, without any other decoration.<br />
+				Example: <a href="/lists/filtered?as=text" target="_blank">
+					<tt>/lists/filtered?as=text</tt>
+				</a>
+			</li>
+			<li>
+				<b><tt>list</tt></b><br />
+				Simple list output without any comments or other formatting.<br />
+				Each domain is on its own line.<br />
+				Example: <a href="/lists/filtered?as=list" target="_blank">
+					<tt>/lists/filtered?as=list</tt>
+				</a>
+			</li>
+			<li>
+				<b><tt>dnsmasq</tt></b><br />
+				Outputs the list in a dnsmasq compatible configuration file format.<br />
+				Thus, it can directly be imported by dnsmasq using the <tt>conf-file = ...</tt> configuration
+				parameter.<br />
+				Example: <a href="/lists/filtered?as=dnsmasq" target="_blank">
+					<tt>/lists/filtered?as=dnsmasq</tt>
+				</a>
+			</li>
+
+			<li>
+				<b><tt>dnsmasq-list</tt></b><br />
+				Outputs the list in a dnsmasq compatible configuration file format without comments.<br />
+				Thus, it can directly be imported by dnsmasq using the <tt>conf-file = ...</tt> configuration
+				parameter.<br />
+				Example: <a href="/lists/filtered?as=dnsmasq-list" target="_blank">
+					<tt>/lists/filtered?as=dnsmasq-list</tt>
+				</a>
+			</li>
+		</ul>
+		<br />
+		Note: If you use an output format that includes an upstream server, currently only <tt>dnsmasq</tt> compatible
+		formats, you can override which IP address is baked into the file using the <tt>upstream</tt> query
+		parameter.<br />
+		Example: <a href="/lists/filtered?as=dnsmasq&upstream=100.64.11.19" target="_blank">
+			<tt>/lists/filtered?as=dnsmasq&upstream=100.64.11.19</tt>
+		</a>
+	</article>
+
+	<h3 id="dnsmasq-example">dnsmasq Example</h3>
+	<article>
+		Let's say you want to only forward custom TLDs to the CGHMN with your local dnsmasq instance, but ignore all
+		other domain name overrides the network offers.<br />
+		<br />
+		First, download and store <a href="/update-cghmn-dns-list.sh">this shell script</a> somewhere sensible,
+		e.g. <tt>/opt/update-cghmn-dns-list.sh</tt>.<br />
+		Make sure you can execute it by running <tt>chmod +x /opt/update-cghmn-dns-list.sh</tt>.<br />
+		<br />
+		Then, you can add the following entry to your crontab:<br />
+		<tt>*/5 * * * * /opt/update-cghmn-dns-list.sh /etc/dnsmasq-cghmn.conf 100.64.11.19
+			allowed_types=tld</tt><br />
+		<br />
+		Last but not least, add this line to your dnsmasq configuration, likely at <tt>/etc/dnsmasq.conf</tt>:<br />
+		<tt>conf-file = /etc/dnsmasq-cghmn.conf</tt><br />
+		<br />
+		That's pretty much it. Now, every five minutes, this API is queried for the most up-to-date list of domain
+		name
+		overrides, with your filters applied, and loaded into dnsmasq if anything has changed.
+	</article>
+
+	<h3 id="domain-overview">Domain Overview</h3>
+	<article>
+		Below is a list of all currently overridden domains (and their subdomains):<br />
+		<br />
+
+		<b>Live Domains:</b> <a href="/lists/filtered?allowed_types=live" target="_blank"><tt>live</tt></a>
+		<ul>
+			<?php foreach ($orderedEntries['live'] as $category => $entries) { ?>
+				<li>
+					Category
+					<a href="/lists/filtered?allowed_types=live&allowed_categories=<?= $category ?>"
+						target="_blank"><tt><?= $category ?></tt></a>:
+					<ul>
+						<?php foreach ($entries as $entry) { ?>
+							<li><?= $entry->domain ?></li>
+						<?php } ?>
+					</ul>
+				</li>
+			<?php } ?>
+		</ul>
+
+		<b>Dead Domains:</b> <a href="/lists/filtered?allowed_types=dead" target="_blank"><tt>dead</tt></a>
+		<ul>
+			<?php foreach ($orderedEntries['dead'] as $category => $entries) { ?>
+				<li>
+					Category
+					<a href="/lists/filtered?allowed_types=dead&allowed_categories=<?= $category ?>"
+						target="_blank"><tt><?= $category ?></tt></a>:
+					<ul>
+						<?php foreach ($entries as $entry) { ?>
+							<li><?= $entry->domain ?></li>
+						<?php } ?>
+					</ul>
+				</li>
+			<?php } ?>
+		</ul>
+
+		<b>Custom TLDs:</b> <a href="/lists/filtered?allowed_types=tld" target="_blank"><tt>tld</tt></a>
+		<ul>
+			<?php foreach ($orderedEntries['tld'] as $category => $entries)
+				foreach ($entries as $entry) { ?>
+					<li>
+						<a href="/lists/filtered?allowed_types=tld&allowed_categories=<?= $category ?>" target="_blank">
+							<tt><?= $category ?></tt>
+						</a>
+					</li>
+				<?php } ?>
+		</ul>
+		<br />
+		<small>Last updated: <?= $lastUpdateFormatted ?></small>
+	</article>
+</body>
+
+</html>

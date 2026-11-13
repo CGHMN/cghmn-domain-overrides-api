@@ -1,0 +1,27 @@
+{
+  "name": "cghmn/dnsmasq-override-extractor",
+  "autoload": {
+    "psr-4": {
+      "Src\\": "src/"
+    },
+    "files": [
+      "src/autoload.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "CGHMN",
+      "email": "contact@cghmn.org"
+    }
+  ],
+  "require": {
+    "miladrahimi/phprouter": "^5.1",
+    "vlucas/phpdotenv": "^5.8"
+  },
+  "scripts": {
+    "server": [
+      "Composer\\Config::disableProcessTimeout",
+      "php -t web -S 0.0.0.0:8001 web/router.php"
+    ]
+  }
+}
