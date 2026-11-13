@@ -2,7 +2,6 @@
 
 namespace Src\Controllers;
 
-use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\ServerRequest;
 use Src\Helpers\DnsmasqOverrideParser;
@@ -41,7 +40,7 @@ class FilteredListController
 	{
 		try {
 			$parsedData = DnsmasqOverrideParser::findUniqueDomainEntriesFromConfig();
-		} catch (Exception $exception) {
+		} catch (\Exception $exception) {
 			return new HtmlResponse(
 				"# Failed to fetch override data: {$exception->getMessage()}",
 				500,
