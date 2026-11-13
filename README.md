@@ -20,7 +20,7 @@ server {
 	root /opt/cghmn-domain-overrides-api/web;
 
 	location / {
-		try_files $uri $uri/ /router.php;
+		try_files $uri $uri/ /router.php?$query_string;
 	}
 
 	location ~ \.php$ {
