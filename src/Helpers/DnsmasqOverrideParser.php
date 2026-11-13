@@ -3,6 +3,7 @@
 namespace Src\Helpers;
 
 use Src\Classes\DnsmasqEntryParser\BaseEntry;
+use Src\Classes\DnsmasqEntryParser\ServerEntry;
 
 class DnsmasqOverrideParser
 {
@@ -42,6 +43,17 @@ class DnsmasqOverrideParser
 
 			$entries = [...$entries, ...$dir_entries];
 		}
+
+		// Add .retro and .cghmn domain entries
+		$retroEntry = new ServerEntry('retro', $_ENV['DEFAULT_UPSTREAM_SERVER']);
+		$retroEntry->sourceFileName = 'default';
+		$retroEntry->sourceFileType = 'tld';
+		$entries[] = $retroEntry;
+
+		$cghmnEntry = new ServerEntry('cghmn', $_ENV['DEFAULT_UPSTREAM_SERVER']);
+		$cghmnEntry->sourceFileName = 'default';
+		$cghmnEntry->sourceFileType = 'tld';
+		$entries[] = $cghmnEntry;
 
 		return (object) [
 			'lastUpdate' => $last_update,
