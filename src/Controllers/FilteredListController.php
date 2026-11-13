@@ -2,6 +2,7 @@
 
 namespace Src\Controllers;
 
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\ServerRequest;
 use Src\Helpers\DnsmasqOverrideParser;
@@ -38,7 +39,16 @@ class FilteredListController
 	 */
 	public function getFilteredList(ServerRequest $request)
 	{
-		$parsedData = DnsmasqOverrideParser::findUniqueDomainEntriesFromConfig();
+		try {
+			$parsedData = DnsmasqOverrideParser::findUniqueDomainEntriesFromConfig();
+		} catch (Exception $exception) {
+			return new HtmlResponse(
+				"# Failed to fetch override data: {$exception->getMessage()}",
+				500,
+				['Content-Type' => 'text/plain']
+			);
+		}
+
 		$lastUpdate = $parsedData->lastUpdate;
 		$lastUpdateFormatted = \date("r", $parsedData->lastUpdate);
 		$domainEntries = $parsedData->entries;
