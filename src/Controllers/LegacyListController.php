@@ -35,7 +35,7 @@ class LegacyListController
 			# CGHMN Overridden Domain List
 			# Last Update: {$lastUpdateFormatted}
 			# Last Update Timestamp: {$lastUpdate}
-			EOF . "\n" : '';
+			EOF . "\n\n" : '';
 
 		foreach ($domainEntries as $entry) {
 			$output .= match ($as) {
