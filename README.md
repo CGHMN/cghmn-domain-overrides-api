@@ -15,7 +15,7 @@ server {
 	listen 80 default_server;
 	server_name _;
 
-	root /opt/wg-endpoint-api/web;
+	root /opt/cghmn-domain-overrides-api/web;
 
 	location / {
 		try_files $uri $uri/ /router.php;
