@@ -16,6 +16,7 @@ server {
 	listen 80 default_server;
 	server_name _;
 
+	index router.php;
 	root /opt/cghmn-domain-overrides-api/web;
 
 	location / {
