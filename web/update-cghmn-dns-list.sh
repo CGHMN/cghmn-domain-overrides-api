@@ -5,7 +5,7 @@
 # Call like so via cron or systemd-timer:
 #
 # update-cghmn-dns-list.sh <target-conf-file> <server[:<[port>]]> [<filter=value>] [...]
-# update-cghmn-dns-list.sh /etc/dnsmasq-cghmn.conf 100.64.11.19 allowed_types=dead,tld denied_domains=aol.com
+# update-cghmn-dns-list.sh /etc/dnsmasq-cghmn.conf 100.64.11.19 allowed_types=dead,tld disallowed_domains=aol.com
 #
 # and add the following to your dnsmasq.conf file:
 # conf-file=/etc/dnsmasq-cghmn.conf

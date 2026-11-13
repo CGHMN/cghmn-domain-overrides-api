@@ -55,11 +55,11 @@ class FilteredListController
 		// Get query parameters
 		$params = $request->getQueryParams();
 		$allowDomains = \array_key_exists('allowed_domains', $params) ? explode(',', $params['allowed_domains']) : null;
-		$denyDomains = \array_key_exists('denied_domains', $params) ? explode(',', $params['denied_domains']) : null;
+		$disallowDomains = \array_key_exists('disallowed_domains', $params) ? explode(',', $params['disallowed_domains']) : null;
 		$allowCategories = \array_key_exists('allowed_categories', $params) ? explode(',', $params['allowed_categories']) : null;
-		$denyCategories = \array_key_exists('denied_categories', $params) ? explode(',', $params['denied_categories']) : null;
+		$disallowCategories = \array_key_exists('disallowed_categories', $params) ? explode(',', $params['disallowed_categories']) : null;
 		$allowTypes = \array_key_exists('allowed_types', $params) ? explode(',', $params['allowed_types']) : null;
-		$denyTypes = \array_key_exists('denied_types', $params) ? explode(',', $params['denied_types']) : null;
+		$disallowTypes = \array_key_exists('disallowed_types', $params) ? explode(',', $params['disallowed_types']) : null;
 		$outputType = \array_key_exists('as', $params) ? $params['as'] : 'text';
 		$upstreamServer = \array_key_exists('upstream', $params) ? $params['upstream'] : $_ENV['DEFAULT_UPSTREAM_SERVER'];
 
@@ -81,20 +81,20 @@ class FilteredListController
 		if ($allowDomains) {
 			$output .= "# Allowed domains: " . implode(', ', $allowDomains) . "\n";
 		}
-		if ($denyDomains) {
-			$output .= "# Denied domains: " . implode(', ', $denyDomains) . "\n";
+		if ($disallowDomains) {
+			$output .= "# Disallowed domains: " . implode(', ', $disallowDomains) . "\n";
 		}
 		if ($allowCategories) {
 			$output .= "# Allowed categories: " . implode(', ', $allowCategories) . "\n";
 		}
-		if ($denyCategories) {
-			$output .= "# Denied categories: " . implode(', ', $denyCategories) . "\n";
+		if ($disallowCategories) {
+			$output .= "# Disallowed categories: " . implode(', ', $disallowCategories) . "\n";
 		}
 		if ($allowTypes) {
 			$output .= "# Allowed types: " . implode(', ', $allowTypes) . "\n";
 		}
-		if ($denyTypes) {
-			$output .= "# Denied types: " . implode(', ', $denyTypes) . "\n";
+		if ($disallowTypes) {
+			$output .= "# Disallowed types: " . implode(', ', $disallowTypes) . "\n";
 		}
 		$output .= "\n";
 
@@ -107,11 +107,11 @@ class FilteredListController
 			// Apply all set filter lists
 			if (
 				($allowDomains && !DnsmasqOverrideParser::domainInArray($allowDomains, $entry->domain)) ||
-				($denyDomains && DnsmasqOverrideParser::domainInArray($denyDomains, $entry->domain)) ||
+				($disallowDomains && DnsmasqOverrideParser::domainInArray($disallowDomains, $entry->domain)) ||
 				($allowCategories && !\in_array($entry->sourceFileName, $allowCategories)) ||
-				($denyCategories && \in_array($entry->sourceFileName, $denyCategories)) ||
+				($disallowCategories && \in_array($entry->sourceFileName, $disallowCategories)) ||
 				($allowTypes && !\in_array($entry->sourceFileType, $allowTypes)) ||
-				($denyTypes && \in_array($entry->sourceFileType, $denyTypes))
+				($disallowTypes && \in_array($entry->sourceFileType, $disallowTypes))
 			) {
 				continue;
 			}

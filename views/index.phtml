@@ -79,10 +79,10 @@
 				</a>, allow only microsoft.com and *.microsoft.com domains.
 			</li>
 			<li>
-				<b><tt>denied_domains</tt></b><br />
+				<b><tt>disallowed_domains</tt></b><br />
 				Set a list of domains which shall never be included in the output list.<br />
-				Example: <a href="/lists/filtered?denied_domains=microsoft.com" target="_blank">
-					<tt>/lists/filtered?denied_domains=microsoft.com</tt>
+				Example: <a href="/lists/filtered?disallowed_domains=microsoft.com" target="_blank">
+					<tt>/lists/filtered?disallowed_domains=microsoft.com</tt>
 				</a>, never allow microsoft.com or *.microsoft.com domains.
 			</li>
 			<li>
@@ -94,10 +94,10 @@
 				</a>, allow domains restoring QuakeWorld and Phantasy Star Online functionality but nothing else.
 			</li>
 			<li>
-				<b><tt>denied_categories</tt></b><br />
+				<b><tt>disallowed_categories</tt></b><br />
 				Set a list of categories which shall never be included in the output list.<br />
-				Example: <a href="/lists/filtered?denied_categories=blackhole-adobe,macromedia" target="_blank">
-					<tt>/lists/filtered?denied_categories=blackhole-adobe,macromedia</tt>
+				Example: <a href="/lists/filtered?disallowed_categories=blackhole-adobe,macromedia" target="_blank">
+					<tt>/lists/filtered?disallowed_categories=blackhole-adobe,macromedia</tt>
 				</a>, allow all overrides except ones that "blackhole" (block) certain Adobe servers
 				or redirect Macromedia domains to a local server on the CGHMN.
 			</li>
@@ -110,15 +110,15 @@
 				</a>, allow overrides for "dead" domains and custom TLDs, but not "live" domains.
 			</li>
 			<li>
-				<b><tt>denied_types</tt></b><br />
+				<b><tt>disallowed_types</tt></b><br />
 				Set a list of override types which shall never be included in the output list.<br />
-				Example: <a href="/lists/filtered?denied_types=tld" target="_blank">
-					<tt>/lists/filtered?denied_types=tld</tt>
+				Example: <a href="/lists/filtered?disallowed_types=tld" target="_blank">
+					<tt>/lists/filtered?disallowed_types=tld</tt>
 				</a>, allow all overrides except custom TLDs.
 			</li>
 		</ul>
 		<br />
-		Note: Domains specified in the <tt>allowed_domains</tt> and <tt>denied_domains</tt> filters match for the
+		Note: Domains specified in the <tt>allowed_domains</tt> and <tt>disallowed_domains</tt> filters match for the
 		specified domain itself <i>and all subdomains under it</i>. So if you specify
 		<tt>?allowed_domains=example.org</tt>, not only will <tt>example.org</tt> itself be allowed to be
 		overridden, but also for example <tt>www.example.org</tt>.
